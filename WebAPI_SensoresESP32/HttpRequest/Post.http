@@ -1,0 +1,26 @@
+GET http://localhost:5030/api/humedad/
+Accept: application/json
+
+###
+POST http://localhost:5030/api/Humedad
+Content-Type: application/json
+
+{
+  "valor": 0.2
+}
+
+###
+POST http://localhost:5030/api/Luminosidad
+Content-Type: application/json
+
+{
+"valor": 10
+}
+
+###
+POST http://localhost:5030/api/Temperatura
+Content-Type: application/json
+
+{
+"valor": 10
+}

@@ -1,0 +1,6 @@
+@WebAPI_SensoresESP32_HostAddress = http://localhost:5030
+
+GET {{WebAPI_SensoresESP32_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
