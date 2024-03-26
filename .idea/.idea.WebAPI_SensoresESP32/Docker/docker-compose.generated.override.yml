@@ -1,0 +1,21 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  webapi_sensoresesp32:
+    build:
+      context: "/Users/luiszamorano/RiderProjects/WebAPI_SensoresESP32"
+      dockerfile: "WebAPI_SensoresESP32/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net8.0/WebAPI_SensoresESP32.dll"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "webapi_sensoresesp32:dev"
+    ports: []
+    volumes:
+    - "/Users/luiszamorano/.nuget/packages:/home/app/.nuget/packages"
+    - "/Users/luiszamorano/RiderProjects/WebAPI_SensoresESP32/WebAPI_SensoresESP32:/app:rw"
+    - "/Users/luiszamorano/RiderProjects/WebAPI_SensoresESP32:/src:rw"
+    working_dir: "/app"
