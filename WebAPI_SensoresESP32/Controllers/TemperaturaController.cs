@@ -7,7 +7,7 @@ namespace WebAPI_SensoresESP32.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class TemperaturaController: Controller
+public class TemperaturaController : Controller
 {
     private readonly InMemoryDatabaseContext _inMemoryDatabaseContext;
 
@@ -15,7 +15,7 @@ public class TemperaturaController: Controller
     {
         _inMemoryDatabaseContext = inMemoryDatabaseContext;
     }
-    
+
     [HttpGet]
     public async Task<ActionResult<List<Temperatura>>> getAllTemperaturas()
     {
@@ -24,18 +24,18 @@ public class TemperaturaController: Controller
             .ToListAsync();
         return Ok(temperaturas);
     }
-    
+
     [HttpGet("id/{id}")]
     public async Task<ActionResult<Temperatura>> getTemperaturaById(Guid id)
     {
         var temperatura = await _inMemoryDatabaseContext.temperatura.FindAsync(id);
         if (temperatura is null)
         {
-            return NotFound("Temperatura no encontrada ese id");
+            return NotFound("Temperatura no encontrada con ese id");
         }
         return Ok(temperatura);
     }
-    
+
     [HttpPost]
     public async Task<ActionResult<Temperatura>> addTemperatura(Temperatura temperatura)
     {
@@ -44,21 +44,26 @@ public class TemperaturaController: Controller
         {
             return Conflict("Ya existe una temperatura con ese id");
         }
-        
+
         _inMemoryDatabaseContext.temperatura.Add(temperatura);
         await _inMemoryDatabaseContext.SaveChangesAsync();
 
         return Ok(temperatura);
     }
-    
+
     [HttpGet("promedio")]
     public async Task<ActionResult<double>> getPromedioTemperatura()
     {
-        var promedio = await _inMemoryDatabaseContext.temperatura.AverageAsync(t => t.valor);
+        var temperaturas = await _inMemoryDatabaseContext.temperatura.ToListAsync();
+        if (!temperaturas.Any())
+        {
+            return NotFound("No hay registros de temperatura disponibles.");
+        }
 
+        var promedio = await _inMemoryDatabaseContext.temperatura.AverageAsync(t => t.valor);
         return Ok(promedio);
     }
-    
+
     [HttpGet("mas_reciente")]
     public async Task<ActionResult<Temperatura>> getTemperaturaMasReciente()
     {
@@ -73,20 +78,30 @@ public class TemperaturaController: Controller
 
         return Ok(ultimaTemperatura);
     }
-    
+
     [HttpGet("minima")]
     public async Task<ActionResult<double>> getTemperaturaMinima()
     {
-        var temperaturaMinima = await _inMemoryDatabaseContext.temperatura.MinAsync(h => h.valor);
+        var temperaturas = await _inMemoryDatabaseContext.temperatura.ToListAsync();
+        if (!temperaturas.Any())
+        {
+            return NotFound("No hay registros de temperatura disponibles.");
+        }
 
+        var temperaturaMinima = await _inMemoryDatabaseContext.temperatura.MinAsync(h => h.valor);
         return Ok(temperaturaMinima);
     }
-    
+
     [HttpGet("maxima")]
     public async Task<ActionResult<double>> getTemperaturaMaxima()
     {
-        var temperaturaMaxima = await _inMemoryDatabaseContext.temperatura.MaxAsync(h => h.valor);
+        var temperaturas = await _inMemoryDatabaseContext.temperatura.ToListAsync();
+        if (!temperaturas.Any())
+        {
+            return NotFound("No hay registros de temperatura disponibles.");
+        }
 
+        var temperaturaMaxima = await _inMemoryDatabaseContext.temperatura.MaxAsync(h => h.valor);
         return Ok(temperaturaMaxima);
     }
 }
