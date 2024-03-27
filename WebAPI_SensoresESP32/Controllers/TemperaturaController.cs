@@ -19,7 +19,9 @@ public class TemperaturaController: Controller
     [HttpGet]
     public async Task<ActionResult<List<Temperatura>>> getAllTemperaturas()
     {
-        var temperaturas = await _inMemoryDatabaseContext.temperatura.ToListAsync();
+        var temperaturas = await _inMemoryDatabaseContext.temperatura
+            .OrderByDescending(t => t.createdAt)
+            .ToListAsync();
         return Ok(temperaturas);
     }
     

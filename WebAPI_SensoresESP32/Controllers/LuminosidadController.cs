@@ -19,7 +19,9 @@ public class LuminosidadController: Controller
     [HttpGet]
     public async Task<ActionResult<List<Luminosidad>>> getAllLuminosidades()
     {
-        var luminosidades = await _inMemoryDatabaseContext.luminosidad.ToListAsync();
+        var luminosidades = await _inMemoryDatabaseContext.luminosidad
+            .OrderByDescending(t => t.createdAt)
+            .ToListAsync();
         return Ok(luminosidades);
     }
     

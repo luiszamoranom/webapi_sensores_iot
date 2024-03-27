@@ -19,7 +19,9 @@ public class HumedadController: Controller
     [HttpGet]
     public async Task<ActionResult<List<Humedad>>> getAllHumedades()
     {
-        var humedades = await _inMemoryDatabaseContext.humedad.ToListAsync();
+        var humedades = await _inMemoryDatabaseContext.humedad
+            .OrderByDescending(t => t.createdAt)
+            .ToListAsync();
         return Ok(humedades);
     }
     
