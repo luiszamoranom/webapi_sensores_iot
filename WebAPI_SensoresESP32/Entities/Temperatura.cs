@@ -15,6 +15,9 @@ public class Temperatura
     public Temperatura()
     {
         id = Guid.NewGuid();
-        createdAt = DateTime.UtcNow;
+        createdAt = TimeZoneInfo.ConvertTimeFromUtc(
+            DateTime.UtcNow,
+            TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time")
+        );
     }
 }

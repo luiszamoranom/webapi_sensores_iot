@@ -14,6 +14,9 @@ public class Humedad
     public Humedad()
     {
         id = Guid.NewGuid();
-        createdAt = DateTime.UtcNow;
+        createdAt = TimeZoneInfo.ConvertTimeFromUtc(
+            DateTime.UtcNow,
+            TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time")
+        );
     }
 }
