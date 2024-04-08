@@ -9,17 +9,17 @@ namespace WebAPI_SensoresESP32.Controllers;
 [ApiController]
 public class HumedadController : Controller
 {
-    private readonly InMemoryDatabaseContext _inMemoryDatabaseContext;
+    private readonly MysqlContext _mysqlContext;
 
-    public HumedadController(InMemoryDatabaseContext inMemoryDatabaseContext)
+    public HumedadController(MysqlContext mysqlContext)
     {
-        _inMemoryDatabaseContext = inMemoryDatabaseContext;
+        _mysqlContext = mysqlContext;
     }
 
     [HttpGet]
     public async Task<ActionResult<List<Humedad>>> getAllHumedades()
     {
-        var humedades = await _inMemoryDatabaseContext.humedad
+        var humedades = await _mysqlContext.humedad
             .OrderByDescending(t => t.createdAt)
             .ToListAsync();
 
@@ -27,9 +27,9 @@ public class HumedadController : Controller
     }
 
     [HttpGet("id/{id}")]
-    public async Task<ActionResult<Humedad>> getHumedadById(Guid id)
+    public async Task<ActionResult<Humedad>> getHumedadById(int id)
     {
-        var humedad = await _inMemoryDatabaseContext.humedad.FindAsync(id);
+        var humedad = await _mysqlContext.humedad.FindAsync(id);
         if (humedad is null)
         {
             return NotFound("Humedad no encontrada con ese id");
@@ -40,14 +40,14 @@ public class HumedadController : Controller
     [HttpPost]
     public async Task<ActionResult<Humedad>> addHumedad(Humedad humedad)
     {
-        var existeHumedad = await _inMemoryDatabaseContext.humedad.FindAsync(humedad.id);
+        var existeHumedad = await _mysqlContext.humedad.FindAsync(humedad.id);
         if (existeHumedad != null)
         {
             return Conflict("Ya existe una humedad con ese id");
         }
 
-        _inMemoryDatabaseContext.humedad.Add(humedad);
-        await _inMemoryDatabaseContext.SaveChangesAsync();
+        _mysqlContext.humedad.Add(humedad);
+        await _mysqlContext.SaveChangesAsync();
 
         return Ok(humedad);
     }
@@ -55,20 +55,20 @@ public class HumedadController : Controller
     [HttpGet("promedio")]
     public async Task<ActionResult<double>> getPromedioHumedad()
     {
-        var humedades = await _inMemoryDatabaseContext.humedad.ToListAsync();
+        var humedades = await _mysqlContext.humedad.ToListAsync();
         if (!humedades.Any())
         {
             return NotFound("No hay registros de humedad disponibles.");
         }
 
-        var promedio = await _inMemoryDatabaseContext.humedad.AverageAsync(t => t.valor);
+        var promedio = await _mysqlContext.humedad.AverageAsync(t => t.valor);
         return Ok(promedio);
     }
 
     [HttpGet("mas_reciente")]
     public async Task<ActionResult<Humedad>> getHumedadMasReciente()
     {
-        var ultimaHumedad = await _inMemoryDatabaseContext.humedad
+        var ultimaHumedad = await _mysqlContext.humedad
             .OrderByDescending(t => t.createdAt)
             .FirstOrDefaultAsync();
 
@@ -83,26 +83,26 @@ public class HumedadController : Controller
     [HttpGet("minima")]
     public async Task<ActionResult<double>> getHumedadMinima()
     {
-        var humedades = await _inMemoryDatabaseContext.humedad.ToListAsync();
+        var humedades = await _mysqlContext.humedad.ToListAsync();
         if (!humedades.Any())
         {
             return NotFound("No hay registros de humedad disponibles.");
         }
 
-        var humedadMinima = await _inMemoryDatabaseContext.humedad.MinAsync(h => h.valor);
+        var humedadMinima = await _mysqlContext.humedad.MinAsync(h => h.valor);
         return Ok(humedadMinima);
     }
 
     [HttpGet("maxima")]
     public async Task<ActionResult<double>> getHumedadMaxima()
     {
-        var humedades = await _inMemoryDatabaseContext.humedad.ToListAsync();
+        var humedades = await _mysqlContext.humedad.ToListAsync();
         if (!humedades.Any())
         {
             return NotFound("No hay registros de humedad disponibles.");
         }
 
-        var humedadMaxima = await _inMemoryDatabaseContext.humedad.MaxAsync(h => h.valor);
+        var humedadMaxima = await _mysqlContext.humedad.MaxAsync(h => h.valor);
         return Ok(humedadMaxima);
     }
 }

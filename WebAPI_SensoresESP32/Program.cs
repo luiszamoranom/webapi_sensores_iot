@@ -3,7 +3,12 @@ using WebAPI_SensoresESP32.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<InMemoryDatabaseContext>(options => options.UseInMemoryDatabase("WebAPI_SensoresESP32"));
+var connectionString = builder.Configuration.GetConnectionString("Connection");
+builder.Services.AddDbContext<MysqlContext>(options => options.UseMySQL(connectionString));
+
+/*
+builder.Services.AddDbContext<PostgresqlContext>(options => options.UseInMemoryDatabase("WebAPI_SensoresESP32"));
+*/
 
 builder.Services.AddCors(options =>
 {

@@ -3,8 +3,13 @@ using WebAPI_SensoresESP32.Entities;
 
 namespace WebAPI_SensoresESP32.Context;
 
-public class InMemoryDatabaseContext: DbContext
+public class MysqlContext: DbContext
 {
+    public MysqlContext(DbContextOptions<MysqlContext> options): base(options)
+    {
+    }
+    
+    /*
     public InMemoryDatabaseContext(DbContextOptions<InMemoryDatabaseContext> options) : base(options)
     {
     }
@@ -17,6 +22,7 @@ public class InMemoryDatabaseContext: DbContext
             optionsBuilder.UseInMemoryDatabase("WebAPI_SensoresESP32");
         }
     }
+    */
     
     public DbSet<Humedad> humedad { get; set; }
     public DbSet<Luminosidad> luminosidad { get; set; }

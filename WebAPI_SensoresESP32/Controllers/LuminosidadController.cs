@@ -9,17 +9,17 @@ namespace WebAPI_SensoresESP32.Controllers;
 [ApiController]
 public class LuminosidadController : Controller
 {
-    private readonly InMemoryDatabaseContext _inMemoryDatabaseContext;
+    private readonly MysqlContext _mysqlContext;
 
-    public LuminosidadController(InMemoryDatabaseContext inMemoryDatabaseContext)
+    public LuminosidadController(MysqlContext mysqlContext)
     {
-        _inMemoryDatabaseContext = inMemoryDatabaseContext;
+        _mysqlContext = mysqlContext;
     }
 
     [HttpGet]
     public async Task<ActionResult<List<Luminosidad>>> getAllLuminosidades()
     {
-        var luminosidades = await _inMemoryDatabaseContext.luminosidad
+        var luminosidades = await _mysqlContext.luminosidad
             .OrderByDescending(t => t.createdAt)
             .ToListAsync();
         
@@ -28,9 +28,9 @@ public class LuminosidadController : Controller
     }
 
     [HttpGet("id/{id}")]
-    public async Task<ActionResult<Luminosidad>> getLuminosidadById(Guid id)
+    public async Task<ActionResult<Luminosidad>> getLuminosidadById(int id)
     {
-        var luminosidad = await _inMemoryDatabaseContext.luminosidad.FindAsync(id);
+        var luminosidad = await _mysqlContext.luminosidad.FindAsync(id);
         if (luminosidad is null)
         {
             return NotFound("Luminosidad no encontrada con ese id");
@@ -41,14 +41,14 @@ public class LuminosidadController : Controller
     [HttpPost]
     public async Task<ActionResult<Luminosidad>> addLuminosidad(Luminosidad luminosidad)
     {
-        var existeLuminosidad = await _inMemoryDatabaseContext.luminosidad.FindAsync(luminosidad.id);
+        var existeLuminosidad = await _mysqlContext.luminosidad.FindAsync(luminosidad.id);
         if (existeLuminosidad != null)
         {
             return Conflict("Ya existe una luminosidad con ese id");
         }
 
-        _inMemoryDatabaseContext.luminosidad.Add(luminosidad);
-        await _inMemoryDatabaseContext.SaveChangesAsync();
+        _mysqlContext.luminosidad.Add(luminosidad);
+        await _mysqlContext.SaveChangesAsync();
 
         return Ok(luminosidad);
     }
@@ -56,20 +56,20 @@ public class LuminosidadController : Controller
     [HttpGet("promedio")]
     public async Task<ActionResult<double>> getPromedioLuminosidad()
     {
-        var luminosidades = await _inMemoryDatabaseContext.luminosidad.ToListAsync();
+        var luminosidades = await _mysqlContext.luminosidad.ToListAsync();
         if (!luminosidades.Any())
         {
             return NotFound("No hay registros de luminosidad disponibles.");
         }
 
-        var promedio = await _inMemoryDatabaseContext.luminosidad.AverageAsync(t => t.valor);
+        var promedio = await _mysqlContext.luminosidad.AverageAsync(t => t.valor);
         return Ok(promedio);
     }
 
     [HttpGet("mas_reciente")]
     public async Task<ActionResult<Luminosidad>> getLuminosidadMasReciente()
     {
-        var ultimaLuminosidad = await _inMemoryDatabaseContext.luminosidad
+        var ultimaLuminosidad = await _mysqlContext.luminosidad
             .OrderByDescending(t => t.createdAt)
             .FirstOrDefaultAsync();
 
@@ -84,26 +84,26 @@ public class LuminosidadController : Controller
     [HttpGet("minima")]
     public async Task<ActionResult<double>> getLuminosidadMinima()
     {
-        var luminosidades = await _inMemoryDatabaseContext.luminosidad.ToListAsync();
+        var luminosidades = await _mysqlContext.luminosidad.ToListAsync();
         if (!luminosidades.Any())
         {
             return NotFound("No hay registros de luminosidad disponibles.");
         }
 
-        var luminosidadMinima = await _inMemoryDatabaseContext.luminosidad.MinAsync(h => h.valor);
+        var luminosidadMinima = await _mysqlContext.luminosidad.MinAsync(h => h.valor);
         return Ok(luminosidadMinima);
     }
 
     [HttpGet("maxima")]
     public async Task<ActionResult<double>> getLuminosidadMaxima()
     {
-        var luminosidades = await _inMemoryDatabaseContext.luminosidad.ToListAsync();
+        var luminosidades = await _mysqlContext.luminosidad.ToListAsync();
         if (!luminosidades.Any())
         {
             return NotFound("No hay registros de luminosidad disponibles.");
         }
 
-        var luminosidadMaxima = await _inMemoryDatabaseContext.luminosidad.MaxAsync(h => h.valor);
+        var luminosidadMaxima = await _mysqlContext.luminosidad.MaxAsync(h => h.valor);
         return Ok(luminosidadMaxima);
     }
 }

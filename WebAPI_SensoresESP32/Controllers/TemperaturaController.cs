@@ -9,26 +9,26 @@ namespace WebAPI_SensoresESP32.Controllers;
 [ApiController]
 public class TemperaturaController : Controller
 {
-    private readonly InMemoryDatabaseContext _inMemoryDatabaseContext;
+    private readonly MysqlContext _mysqlContext;
 
-    public TemperaturaController(InMemoryDatabaseContext inMemoryDatabaseContext)
+    public TemperaturaController(MysqlContext mysqlContext)
     {
-        _inMemoryDatabaseContext = inMemoryDatabaseContext;
+        _mysqlContext = mysqlContext;
     }
 
     [HttpGet]
     public async Task<ActionResult<List<Temperatura>>> getAllTemperaturas()
     {
-        var temperaturas = await _inMemoryDatabaseContext.temperatura
+        var temperaturas = await _mysqlContext.temperatura
             .OrderByDescending(t => t.createdAt)
             .ToListAsync();
         return Ok(temperaturas);
     }
 
     [HttpGet("id/{id}")]
-    public async Task<ActionResult<Temperatura>> getTemperaturaById(Guid id)
+    public async Task<ActionResult<Temperatura>> getTemperaturaById(int id)
     {
-        var temperatura = await _inMemoryDatabaseContext.temperatura.FindAsync(id);
+        var temperatura = await _mysqlContext.temperatura.FindAsync(id);
         if (temperatura is null)
         {
             return NotFound("Temperatura no encontrada con ese id");
@@ -39,14 +39,14 @@ public class TemperaturaController : Controller
     [HttpPost]
     public async Task<ActionResult<Temperatura>> addTemperatura(Temperatura temperatura)
     {
-        var existeTemperatura = await _inMemoryDatabaseContext.temperatura.FindAsync(temperatura.id);
+        var existeTemperatura = await _mysqlContext.temperatura.FindAsync(temperatura.id);
         if (existeTemperatura != null)
         {
             return Conflict("Ya existe una temperatura con ese id");
         }
 
-        _inMemoryDatabaseContext.temperatura.Add(temperatura);
-        await _inMemoryDatabaseContext.SaveChangesAsync();
+        _mysqlContext.temperatura.Add(temperatura);
+        await _mysqlContext.SaveChangesAsync();
 
         return Ok(temperatura);
     }
@@ -54,20 +54,20 @@ public class TemperaturaController : Controller
     [HttpGet("promedio")]
     public async Task<ActionResult<double>> getPromedioTemperatura()
     {
-        var temperaturas = await _inMemoryDatabaseContext.temperatura.ToListAsync();
+        var temperaturas = await _mysqlContext.temperatura.ToListAsync();
         if (!temperaturas.Any())
         {
             return NotFound("No hay registros de temperatura disponibles.");
         }
 
-        var promedio = await _inMemoryDatabaseContext.temperatura.AverageAsync(t => t.valor);
+        var promedio = await _mysqlContext.temperatura.AverageAsync(t => t.valor);
         return Ok(promedio);
     }
 
     [HttpGet("mas_reciente")]
     public async Task<ActionResult<Temperatura>> getTemperaturaMasReciente()
     {
-        var ultimaTemperatura = await _inMemoryDatabaseContext.temperatura
+        var ultimaTemperatura = await _mysqlContext.temperatura
             .OrderByDescending(t => t.createdAt)
             .FirstOrDefaultAsync();
 
@@ -82,26 +82,26 @@ public class TemperaturaController : Controller
     [HttpGet("minima")]
     public async Task<ActionResult<double>> getTemperaturaMinima()
     {
-        var temperaturas = await _inMemoryDatabaseContext.temperatura.ToListAsync();
+        var temperaturas = await _mysqlContext.temperatura.ToListAsync();
         if (!temperaturas.Any())
         {
             return NotFound("No hay registros de temperatura disponibles.");
         }
 
-        var temperaturaMinima = await _inMemoryDatabaseContext.temperatura.MinAsync(h => h.valor);
+        var temperaturaMinima = await _mysqlContext.temperatura.MinAsync(h => h.valor);
         return Ok(temperaturaMinima);
     }
 
     [HttpGet("maxima")]
     public async Task<ActionResult<double>> getTemperaturaMaxima()
     {
-        var temperaturas = await _inMemoryDatabaseContext.temperatura.ToListAsync();
+        var temperaturas = await _mysqlContext.temperatura.ToListAsync();
         if (!temperaturas.Any())
         {
             return NotFound("No hay registros de temperatura disponibles.");
         }
 
-        var temperaturaMaxima = await _inMemoryDatabaseContext.temperatura.MaxAsync(h => h.valor);
+        var temperaturaMaxima = await _mysqlContext.temperatura.MaxAsync(h => h.valor);
         return Ok(temperaturaMaxima);
     }
 }

@@ -1,4 +1,4 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/sdk:8.0 AS base
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
@@ -10,6 +10,12 @@ WORKDIR /src
 COPY ["WebAPI_SensoresESP32/WebAPI_SensoresESP32.csproj", "WebAPI_SensoresESP32/"]
 RUN dotnet restore "WebAPI_SensoresESP32/WebAPI_SensoresESP32.csproj"
 COPY . .
+
+RUN dotnet tool install --global dotnet-ef --version 8.0.3
+RUN /root/.dotnet/tools/dotnet-ef migrations add InitialCreate --project WebAPI_SensoresESP32/WebAPI_SensoresESP32.csproj -v
+RUN /root/.dotnet/tools/dotnet-ef database update --project WebAPI_SensoresESP32/WebAPI_SensoresESP32.csproj
+
+
 WORKDIR "/src/WebAPI_SensoresESP32"
 RUN dotnet build "WebAPI_SensoresESP32.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
